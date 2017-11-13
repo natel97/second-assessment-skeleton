@@ -23,6 +23,8 @@ public class Users {
 	
 	private String username;
 	private Timestamp joined;
+	@OneToOne
+	private Credentials credentials;
 	
 	@OneToMany
 	private List<Tweet> tweets;
@@ -44,12 +46,14 @@ public class Users {
 	public Profile getProfile() { return profile; }
 	public Timestamp getJoined() { return joined; }
 	public List<Tweet> getTweets() { return tweets; }
+	public Credentials getCredentials() { return credentials; }
 	
 	public void setId(Integer id) { this.id = id; }
 	public void setUsername(String username) { this.username = username; }
 	public void setProfile(Profile profile) { this.profile = profile; }
 	public void setJoined(Timestamp joined) { this.joined = joined; }
 	public void setTweets(List<Tweet> tweets) { this.tweets = tweets; }
+	public void setCredentials(Credentials credentials) {this.credentials = credentials; }
 
 	@Override
 	public int hashCode() {
