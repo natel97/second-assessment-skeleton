@@ -1,35 +1,42 @@
 package com.cooksys.second_assessment.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.entity.Tweet;
+import com.cooksys.second_assessment.service.TweetsService;
+
 @RestController
 @RequestMapping("tweets")
 public class TweetsController {
+	
+	TweetsService tweetService;
 
-	public TweetsController() {
-		
+	public TweetsController(TweetsService tweetService) {
+		this.tweetService = tweetService;
 	}
 	
 	@GetMapping()
-	public void getAllTweets() {
-		//TODO: Should return all tweets!
-		
+	public List<Tweet> getAllTweets() {
+		return tweetService.findAllTweets();		
 	}
 	
 	@PostMapping()
-	public void addATweet() {
-		//Takes a content and credentials; returns tweet
-		
+	public Tweet addATweet(@RequestBody Tweet tweet) {
+		tweetService.addTweet(tweet);
+		return tweet;
 	}
 	
 	@GetMapping("{id}")
-	public void getTweetByID(@RequestParam Integer id) {
-		
+	public Tweet getTweetByID(@RequestParam Integer id) {
+		return tweetService.findById(id);
 	}
 	
 	@DeleteMapping("{id}")

@@ -1,6 +1,7 @@
 package com.cooksys.second_assessment.entity;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -11,40 +12,44 @@ import javax.persistence.OneToOne;
 
 
 @Entity
-public class User {
+public class Users {
 	
 	@Id
 	@GeneratedValue
-	private long id;
+	private Integer id;
 	
 	@OneToOne
 	private Profile profile;
 	
 	private String username;
-	private Date joined;
+	private Timestamp joined;
 	
 	@OneToMany
 	private List<Tweet> tweets;
 	
 	
-	public User() {	}
+	public Users() {	
+		this.joined = Timestamp.from(Instant.now());
+	}
 	
-	public User(String username, Profile profile, Date joined) { 
+	public Users(String username, Profile profile, Timestamp joined) { 
 		this.username = username;
 		this.profile = profile;
 		this.joined = joined;
 	}
 	
 	
-	public long getId() { return id; }
+	public Integer getId() { return id; }
 	public String getUsername() { return username; }
 	public Profile getProfile() { return profile; }
-	public Date getJoined() { return joined; }
+	public Timestamp getJoined() { return joined; }
+	public List<Tweet> getTweets() { return tweets; }
 	
-	public void setId(long id) { this.id = id; }
+	public void setId(Integer id) { this.id = id; }
 	public void setUsername(String username) { this.username = username; }
 	public void setProfile(Profile profile) { this.profile = profile; }
-	public void setJoined(Date joined) { this.joined = joined; }
+	public void setJoined(Timestamp joined) { this.joined = joined; }
+	public void setTweets(List<Tweet> tweets) { this.tweets = tweets; }
 
 	@Override
 	public int hashCode() {
@@ -62,7 +67,7 @@ public class User {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		User other = (User) obj;
+		Users other = (Users) obj;
 		if (id != other.id)
 			return false;
 		return true;
