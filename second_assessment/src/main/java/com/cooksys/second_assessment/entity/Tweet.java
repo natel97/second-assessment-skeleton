@@ -48,10 +48,10 @@ public class Tweet {
 	private void search(String content) {
 		Matcher atMatcher = Pattern.compile("@\\w+ ").matcher(content);
 		Matcher hashtagMatcher = Pattern.compile("#\\w+ ").matcher(content);
-		while(atMatcher.find()) {
+		while (atMatcher.find()) {
 			System.out.println(atMatcher.group());
 		}
-		while(hashtagMatcher.find()) {
+		while (hashtagMatcher.find()) {
 			System.out.println(hashtagMatcher.group());
 		}
 	}

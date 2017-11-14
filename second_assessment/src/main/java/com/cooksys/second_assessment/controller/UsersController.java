@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.second_assessment.entity.Users;
@@ -36,19 +36,19 @@ public class UsersController {
 	}
 
 	@GetMapping("/@{username}")
-	public Users getUser(@RequestParam String username) {
+	public Users getUser(@PathVariable String username) {
 		return usersService.findUserByUsername(username);
 	}
 
 	@PatchMapping("@{username}")
-	public void updateUser(@RequestParam String username) {
+	public void updateUser(@PathVariable String username) {
 		// TODO: Update a user here! Should return the updated user or an error
 		// Should take in a credentials object and profile object
 		System.out.println(username + " should be updated here if he/she exists");
 	}
 
 	@DeleteMapping("@{username}")
-	public void deleteUser(@RequestParam String username) {
+	public void deleteUser(@PathVariable String username) {
 		// TODO: This should take in a credentials object and return the deleted user
 		// NOTICE: Should not delete; only set flag that user should not be accessible
 
@@ -65,23 +65,23 @@ public class UsersController {
 	}
 
 	@GetMapping("@{username}/feed")
-	public String getUserFeed(@RequestParam String username) {
+	public String getUserFeed(@PathVariable String username) {
 		// TODO: Get all authorized tweets, reposts, and replies in chronological order
 		return username + "'s feed!";
 	}
 
 	@GetMapping("@{username}/mentions")
-	public void getMentions(@RequestParam String username) {
+	public void getMentions(@PathVariable String username) {
 
 	}
 
 	@GetMapping("@{username}/followers")
-	public void getFollowers(@RequestParam String username) {
+	public void getFollowers(@PathVariable String username) {
 
 	}
 
 	@GetMapping("@{username}/following")
-	public void getFollowing(@RequestParam String username) {
+	public void getFollowing(@PathVariable String username) {
 
 	}
 

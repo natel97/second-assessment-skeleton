@@ -13,6 +13,7 @@ public class Credentials {
 	private String username;
 	private String password;
 	
+	
 	public Credentials() { }
 	public Credentials(String userName, String password) {
 		this.username = userName;
