@@ -1,15 +1,20 @@
 package com.cooksys.second_assessment.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.second_assessment.Dto.CredentialsDto;
+import com.cooksys.second_assessment.Dto.ProfileDto;
+import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.entity.Credentials;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.InsufficentInformationException;
 import com.cooksys.second_assessment.exceptions.PasswordMismatchException;
+import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.repository.CredentialsRepository;
 import com.cooksys.second_assessment.repository.ProfileRepository;
 import com.cooksys.second_assessment.repository.UsersRepository;
@@ -20,46 +25,61 @@ public class UsersService {
 	private UsersRepository usersRepository;
 	private ProfileRepository profileRepository;
 	private CredentialsRepository credentialsRepository;
+	private DtoMapper mapper;
 	
-	public UsersService(UsersRepository usersRepository, CredentialsRepository credentialsRepository, ProfileRepository profileRepository) {
+	public UsersService(UsersRepository usersRepository, CredentialsRepository credentialsRepository, ProfileRepository profileRepository, DtoMapper mapper) {
 		this.usersRepository = usersRepository;
 		this.credentialsRepository = credentialsRepository;
 		this.profileRepository = profileRepository;
+		this.mapper = mapper;
 	}
 
-	public User findUserByID(Integer id) {
-		return usersRepository.getOne(id);
+	public UserDto findUserByID(Integer id) {
+		return mapper.toUserDto(usersRepository.getOne(id));
 	}
 	
-	public List<User> getAllUsers(){
-		return usersRepository.findAll();
+	public List<UserDto> getAllUsers(){
+		return usersRepository.findAll().stream().map(mapper::toUserDto).collect(Collectors.toList());
 	}
 	
-	public User findUserByUsername(String username) {
-		return usersRepository.findUsersByUsername(username);
+	public UserDto findUserByUsername(String username) {
+		return mapper.toUserDto(usersRepository.findUsersByUsername(username));
 	}
 	
-	public void validateUser(Credentials cred) throws PasswordMismatchException {
+	public void validateUser(CredentialsDto cred) throws PasswordMismatchException {
 		if(cred.getPassword().equals(credentialsRepository.findCredentialsByUsername(cred.getUsername()).getPassword()))
 			throw new PasswordMismatchException();
 	}
 	
-	public List<User> findExistingUsers(){
-		return usersRepository.findUsersByDeleted(false);
+	public List<UserDto> findExistingUsers(){
+		return usersRepository.findUsersByDeleted(false).stream().map(mapper::toUserDto).collect(Collectors.toList());
 	}
 	
 	
 	@Transactional
-	public User addUser(Credentials cred, User u) throws InsufficentInformationException {
+	public UserDto addUser(Credentials cred, User u) throws InsufficentInformationException {
 		if(cred.getUsername() == null || cred.getPassword() == null || u.getProfile().getEmail() == null) {
 			System.out.println("Username, password, or email not provided");
 			throw new InsufficentInformationException();
 		}
 		
 		profileRepository.save(u.getProfile());
-		
 		usersRepository.save(u);
 		return findUserByID(Integer.valueOf(String.valueOf(usersRepository.count())));
 		
+	}
+
+	@Transactional
+	public UserDto deleteUser(String username) {
+		User user = usersRepository.findUsersByUsername(username);
+		user.deleteUser();
+		usersRepository.save(user);
+		return mapper.toUserDto(usersRepository.findUsersByUsername(username));
+	}
+
+	public UserDto updateUser(String username, CredentialsDto credentials, ProfileDto profile) throws PasswordMismatchException {
+		validateUser(credentials);
+		profileRepository.save(mapper.toProfile(profile));
+		return mapper.toUserDto(usersRepository.findUsersByUsername(username));
 	}
 }

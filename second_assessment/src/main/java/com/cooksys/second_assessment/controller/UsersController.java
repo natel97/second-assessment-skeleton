@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.Dto.CredentialsDto;
+import com.cooksys.second_assessment.Dto.ProfileDto;
+import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.UserDeconstructor;
-import com.cooksys.second_assessment.entity.Credentials;
-import com.cooksys.second_assessment.entity.Profile;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.EntityAlreadyExistsException;
 import com.cooksys.second_assessment.exceptions.InsufficentInformationException;
@@ -36,12 +37,12 @@ public class UsersController {
 
 
 	@GetMapping
-	public List<User> displayAllUsers() {
+	public List<UserDto> displayAllUsers() {
 		return usersService.findExistingUsers();
 	}
 
 	@PostMapping()
-	public User addUser(@RequestBody UserDeconstructor userDeconstructor) {
+	public UserDto addUser(@RequestBody UserDeconstructor userDeconstructor) {
 		try {
 		if(usersService.findUserByUsername(userDeconstructor.getCred().getUsername()) != null)
 			throw new EntityAlreadyExistsException();
@@ -55,30 +56,25 @@ public class UsersController {
 	}
 
 	@GetMapping("/@{username}")
-	public User getUser(@PathVariable String username) {
+	public UserDto getUser(@PathVariable String username) {
 		return usersService.findUserByUsername(username);
 	}
 
 	@PatchMapping("@{username}")
-	public User updateUser(@PathVariable String username, @RequestBody Credentials credentials, @RequestBody Profile profile) throws PasswordMismatchException, InsufficentInformationException {
-		usersService.validateUser(credentials);
+	public UserDto updateUser(@PathVariable String username, @RequestBody CredentialsDto credentials, @RequestBody ProfileDto profile) throws PasswordMismatchException, InsufficentInformationException {
 		if(!username.equals(credentials.getUsername()))
 			throw new PasswordMismatchException();
-		User currentUser = usersService.findUserByUsername(username);
-		currentUser.setProfile(profile);
-		return usersService.addUser(credentials, currentUser);
+		return usersService.updateUser(username, credentials, profile);
 	}
 
 	@DeleteMapping("@{username}")
-	public User deleteUser(@PathVariable String username, @RequestBody Credentials cred) throws PasswordMismatchException, InsufficentInformationException {
+	public UserDto deleteUser(@PathVariable String username, @RequestBody CredentialsDto cred) throws PasswordMismatchException, InsufficentInformationException {
 		// TODO: This should take in a credentials object and return the deleted user
 		// NOTICE: Should not delete; only set flag that user should not be accessible
 		if(!username.equals(cred.getUsername()))
 			throw new PasswordMismatchException();
 		usersService.validateUser(cred);
-		User currentUser = usersService.findUserByUsername(username);
-		currentUser.deleteUser();
-		return usersService.addUser(cred, currentUser);
+		return usersService.deleteUser(username);
 	}
 
 	@PostMapping("@{username}/follow")

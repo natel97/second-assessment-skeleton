@@ -7,6 +7,8 @@ public class TweetDto {
 	private Timestamp posted;
 	private String content;
 	
+	public TweetDto() { }
+	
 	public TweetDto(Timestamp posted, String content) {
 		this.setPosted(posted);
 		this.setContent(content);

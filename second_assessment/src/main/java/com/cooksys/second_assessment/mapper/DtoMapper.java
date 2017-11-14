@@ -1,5 +1,6 @@
 package com.cooksys.second_assessment.mapper;
 
+
 import org.mapstruct.Mapper;
 
 import com.cooksys.second_assessment.Dto.ContextDto;
@@ -17,6 +18,7 @@ import com.cooksys.second_assessment.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface DtoMapper {
+	
 	ContextDto toContextPojo(Context contextDao);
 	Context toContextDao(ContextDto context);
 	

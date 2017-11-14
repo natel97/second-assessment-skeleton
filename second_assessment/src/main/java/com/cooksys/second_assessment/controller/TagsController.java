@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.Dto.TweetDto;
 import com.cooksys.second_assessment.entity.Hashtag;
-import com.cooksys.second_assessment.entity.Tweet;
 import com.cooksys.second_assessment.service.HashtagService;
 import com.cooksys.second_assessment.service.TweetsService;
 
@@ -30,7 +30,7 @@ public class TagsController {
 	}
 	
 	@GetMapping("{label}")
-	public List<Tweet> getTweetsByTag(@PathVariable String tag) {
+	public List<TweetDto> getTweetsByTag(@PathVariable String tag) {
 		return tweetsService.findTweetsByHashtag(hashtagService.findHashtagByLabel(tag));
 	}
 	

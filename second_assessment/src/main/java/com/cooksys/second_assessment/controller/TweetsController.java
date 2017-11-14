@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cooksys.second_assessment.entity.Credentials;
-import com.cooksys.second_assessment.entity.Tweet;
+import com.cooksys.second_assessment.Dto.TweetDto;
+import com.cooksys.second_assessment.deconstructors.NewTweetDeconstructor;
 import com.cooksys.second_assessment.service.TweetsService;
 import com.cooksys.second_assessment.service.UsersService;
 
@@ -28,18 +28,18 @@ public class TweetsController {
 	}
 	
 	@GetMapping()
-	public List<Tweet> getAllTweets() {
+	public List<TweetDto> getAllTweets() {
 		return tweetService.findAllTweets();		
 	}
 	
 	@PostMapping()
-	public Tweet addATweet(@RequestBody String content, @RequestBody Credentials credentials) {
-		return tweetService.findById(tweetService.addTweet(new Tweet(userService.findUserByUsername(credentials.getUsername()),content, null, null)));
+	public TweetDto addATweet(@RequestBody NewTweetDeconstructor newTweetDeconstructor) {
+		return tweetService.addTweet(newTweetDeconstructor);
 		
 	}
 	
 	@GetMapping("{id}")
-	public Tweet getTweetByID(@PathVariable Integer id) {
+	public TweetDto getTweetByID(@PathVariable Integer id) {
 		return tweetService.findById(id);
 	}
 	
