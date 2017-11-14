@@ -11,8 +11,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 
-@Entity
-public class Users {
+@Entity(name="users")
+public class User {
 	
 	@Id
 	@GeneratedValue
@@ -21,8 +21,8 @@ public class Users {
 	@OneToOne
 	private Profile profile;
 	
-	private String username;
 	private Timestamp joined;
+	
 	@OneToOne
 	private Credentials credentials;
 	
@@ -30,29 +30,25 @@ public class Users {
 	private List<Tweet> tweets;
 	
 	
-	public Users() {	
+	public User() {	
 		this.joined = Timestamp.from(Instant.now());
 	}
 	
-	public Users(String username, Profile profile, Timestamp joined) { 
-		this.username = username;
+	public User(String username, Profile profile, Timestamp joined) { 
 		this.profile = profile;
 		this.joined = joined;
 	}
 	
 	
 	public Integer getId() { return id; }
-	public String getUsername() { return username; }
+	public String getUsername() { return credentials.getUsername(); }
 	public Profile getProfile() { return profile; }
 	public Timestamp getJoined() { return joined; }
 	public List<Tweet> getTweets() { return tweets; }
 	public Credentials getCredentials() { return credentials; }
 	
 	public void setId(Integer id) { this.id = id; }
-	public void setUsername(String username) { this.username = username; }
 	public void setProfile(Profile profile) { this.profile = profile; }
-	public void setJoined(Timestamp joined) { this.joined = joined; }
-	public void setTweets(List<Tweet> tweets) { this.tweets = tweets; }
 	public void setCredentials(Credentials credentials) {this.credentials = credentials; }
 
 	@Override
@@ -71,7 +67,7 @@ public class Users {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Users other = (Users) obj;
+		User other = (User) obj;
 		if (id != other.id)
 			return false;
 		return true;

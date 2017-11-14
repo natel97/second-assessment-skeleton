@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.second_assessment.entity.Hashtag;
 import com.cooksys.second_assessment.entity.Tweet;
 import com.cooksys.second_assessment.repository.TweetsRepository;
 
@@ -26,9 +27,18 @@ public class TweetsService {
 		return tweetsRepository.findAll();
 	}
 	
+	public List<Tweet> findAvailableTweets(){
+		return tweetsRepository.findByDeleted(false);
+	}
+	
 	@Transactional
-	public void addTweet(Tweet t) {
+	public Integer addTweet(Tweet t) {
 		tweetsRepository.save(t);
+		return Integer.valueOf(String.valueOf(tweetsRepository.count()));
+	}
+	
+	public List<Tweet> findTweetsByHashtag(Hashtag hashtag){
+		return tweetsRepository.findByHashtags(hashtag);
 	}
 	
 

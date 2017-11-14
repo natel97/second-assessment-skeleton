@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.service.HashtagService;
 import com.cooksys.second_assessment.service.UsersService;
 
 @RestController
@@ -12,15 +13,16 @@ import com.cooksys.second_assessment.service.UsersService;
 public class ValidationController {
 	
 	UsersService usersService;
+	HashtagService hashtagService;
 	
-	ValidationController(UsersService usersService){
+	ValidationController(UsersService usersService, HashtagService hashtagService){
 		this.usersService = usersService;
+		this.hashtagService = hashtagService;
 	}
 	
 	@GetMapping("tag/exists/{label}")
 	public boolean tagExists(@PathVariable String label) {
-		//TODO Implement this!
-		return true;
+		return hashtagService.findHashtagByLabel(label) != null;
 	}
 	
 	@GetMapping("username/exists/@{username}")

@@ -1,6 +1,7 @@
 package com.cooksys.second_assessment.entity;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +21,7 @@ public class Tweet {
 	private Integer id;
 
 	@ManyToOne
-	private Users author;
+	private User author;
 	private Timestamp posted;
 	private String content;
 	@OneToOne
@@ -28,16 +29,16 @@ public class Tweet {
 	@OneToOne
 	private Tweet repostOf;
 	@ManyToMany
-	private List<Hashtag> Hashtags;
+	private List<Hashtag> hashtags;
 	private boolean deleted;
 
-	Tweet() {
+	public Tweet() {
 		this.deleted = false;
 	}
 
-	Tweet(Users author, Timestamp posted, String content, Tweet inReplyTo, Tweet repostOf) {
+	public Tweet(User author, String content, Tweet inReplyTo, Tweet repostOf) {
 		this.author = author;
-		this.posted = posted;
+		this.posted = Timestamp.from(Instant.now());
 		this.content = content;
 		this.inReplyTo = inReplyTo;
 		this.repostOf = repostOf;
@@ -60,7 +61,7 @@ public class Tweet {
 		return id;
 	}
 
-	public Users getAuthor() {
+	public User getAuthor() {
 		return author;
 	}
 
@@ -96,7 +97,7 @@ public class Tweet {
 		this.id = id;
 	}
 
-	public void setAuthor(Users author) {
+	public void setAuthor(User author) {
 		this.author = author;
 	}
 

@@ -6,7 +6,9 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import com.cooksys.second_assessment.entity.Users;
+import com.cooksys.second_assessment.entity.Credentials;
+import com.cooksys.second_assessment.entity.User;
+import com.cooksys.second_assessment.exceptions.PasswordMismatchException;
 import com.cooksys.second_assessment.repository.UsersRepository;
 
 @Service
@@ -18,21 +20,26 @@ public class UsersService {
 		this.usersRepository = usersRepository;
 	}
 
-	public Users findUserByID(Integer id) {
+	public User findUserByID(Integer id) {
 		return usersRepository.getOne(id);
 	}
 	
-	public List<Users> getAllUsers(){
+	public List<User> getAllUsers(){
 		return usersRepository.findAll();
 	}
 	
-	public Users findUserByUsername(String username) {
-		return usersRepository.findUserByUsername(username);
+	public User findUserByUsername(String username) {
+		return usersRepository.findUsersByCredentialsUsername(username);
+	}
+	
+	public void validateUser(Credentials cred) throws PasswordMismatchException {
+		if(!usersRepository.findUsersByCredentialsUsername(cred.getUsername()).getCredentials().getPassword().equals(cred.getPassword()));
+	throw new PasswordMismatchException();
 	}
 	
 	
 	@Transactional
-	public Users addUser(Users u) {
+	public User addUser(User u) {
 		usersRepository.save(u);
 		return findUserByID(Integer.valueOf(String.valueOf(usersRepository.count())));
 		

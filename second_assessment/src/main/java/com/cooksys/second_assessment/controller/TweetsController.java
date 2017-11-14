@@ -4,23 +4,27 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.entity.Credentials;
 import com.cooksys.second_assessment.entity.Tweet;
 import com.cooksys.second_assessment.service.TweetsService;
+import com.cooksys.second_assessment.service.UsersService;
 
 @RestController
 @RequestMapping("tweets")
 public class TweetsController {
 	
 	TweetsService tweetService;
+	UsersService userService;
 
-	public TweetsController(TweetsService tweetService) {
+	public TweetsController(TweetsService tweetService, UsersService usersService) {
 		this.tweetService = tweetService;
+		this.userService = usersService;
 	}
 	
 	@GetMapping()
@@ -29,9 +33,9 @@ public class TweetsController {
 	}
 	
 	@PostMapping()
-	public Tweet addATweet(@RequestBody Tweet tweet) {
-		tweetService.addTweet(tweet);
-		return tweet;
+	public Tweet addATweet(@RequestBody String content, @RequestBody Credentials credentials) {
+		return tweetService.findById(tweetService.addTweet(new Tweet(userService.findUserByUsername(credentials.getUsername()),content, null, null)));
+		
 	}
 	
 	@GetMapping("{id}")

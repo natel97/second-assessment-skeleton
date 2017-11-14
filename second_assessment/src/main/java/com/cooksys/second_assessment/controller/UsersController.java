@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cooksys.second_assessment.entity.Users;
+import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.service.UsersService;
 
 @RestController
@@ -26,17 +26,17 @@ public class UsersController {
 
 
 	@GetMapping
-	public List<Users> displayAllUsers() {
+	public List<User> displayAllUsers() {
 		return usersService.getAllUsers();
 	}
 
 	@PostMapping()
-	public Users addUser(@RequestBody Users user) {
+	public User addUser(@RequestBody User user) {
 		return usersService.addUser(user);
 	}
 
 	@GetMapping("/@{username}")
-	public Users getUser(@PathVariable String username) {
+	public User getUser(@PathVariable String username) {
 		return usersService.findUserByUsername(username);
 	}
 
