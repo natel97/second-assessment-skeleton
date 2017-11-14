@@ -7,6 +7,12 @@ import javax.persistence.Id;
 @Entity
 public class Profile {
 	
+	@Override
+	public String toString() {
+		return "Profile [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", phone=" + phone + "]";
+	}
+
 	@Id
 	@GeneratedValue
 	private int id;

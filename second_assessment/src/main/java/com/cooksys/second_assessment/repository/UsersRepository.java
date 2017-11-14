@@ -10,4 +10,6 @@ public interface UsersRepository extends JpaRepository<User, Integer> {
 	
 	public User findUsersByUsername(String username);
 	public List<User> findUsersByDeleted(boolean deleted);
+	public List<User> findUsersByFollowing(User user);
+	
 }

@@ -55,6 +55,13 @@ public class UsersService {
 		return usersRepository.findUsersByDeleted(false).stream().map(mapper::toUserDto).collect(Collectors.toList());
 	}
 	
+	public List<UserDto> getFollowers(String username){
+		return usersRepository.findUsersByFollowing(usersRepository.findUsersByUsername(username)).stream().map(mapper::toUserDto).collect(Collectors.toList());
+	}
+	
+	public List<UserDto> getFollowing(String username){
+		return usersRepository.findUsersByUsername(username).getFollowing().stream().map(mapper::toUserDto).collect(Collectors.toList());
+	}
 	
 	@Transactional
 	public UserDto addUser(Credentials cred, User u) throws InsufficentInformationException {
@@ -62,11 +69,20 @@ public class UsersService {
 			System.out.println("Username, password, or email not provided");
 			throw new InsufficentInformationException();
 		}
-		
+		else {
+			System.out.println(u);
 		profileRepository.save(u.getProfile());
 		usersRepository.save(u);
-		return findUserByID(Integer.valueOf(String.valueOf(usersRepository.count())));
-		
+		return mapper.toUserDto(u);
+		}
+	}
+	@Transactional
+	public void makeAFollowB(String A, String B) {
+		usersRepository.findUsersByUsername(A).followUser(usersRepository.findUsersByUsername(B));
+	}
+	
+	public void makeAUnfollowB(String A, String B) {
+		usersRepository.findUsersByUsername(A).unfollowUser(usersRepository.findUsersByUsername(B));
 	}
 
 	@Transactional

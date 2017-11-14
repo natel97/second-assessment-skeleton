@@ -15,6 +15,12 @@ import javax.persistence.OneToOne;
 @Entity(name="users")
 public class User {
 	
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", profile=" + profile + ", username=" + username + ", joined=" + joined
+				+ ", following=" + following + ", tweets=" + tweets + ", deleted=" + deleted + "]";
+	}
+
 	@Id
 	@GeneratedValue
 	private Integer id;
@@ -32,7 +38,6 @@ public class User {
 	
 	private boolean deleted;
 	
-	
 	public User() {	
 		this.joined = Timestamp.from(Instant.now());
 		this.deleted = false;
@@ -41,9 +46,12 @@ public class User {
 	public User(Profile profile, String username) { 
 		this.profile = profile;
 		this.deleted = false;
+		this.joined = Timestamp.from(Instant.now());
 		this.username = username;
 	}
 	
+	public void followUser(User u) { following.add(u); }
+	public void unfollowUser(User u) { following.remove(u); }
 	
 	public Integer getId() { return id; }
 	public String getUsername() { return username; }
@@ -51,6 +59,7 @@ public class User {
 	public Timestamp getJoined() { return joined; }
 	public List<Tweet> getTweets() { return tweets; }
 	public boolean isDeleted() { return deleted; }
+	public List<User> getFollowing() { return following; }
 	
 	public void setId(Integer id) { this.id = id; }
 	public void setProfile(Profile profile) { this.profile = profile; }
