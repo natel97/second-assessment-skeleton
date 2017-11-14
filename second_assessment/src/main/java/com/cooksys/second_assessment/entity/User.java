@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -20,37 +21,43 @@ public class User {
 	
 	@OneToOne
 	private Profile profile;
-	
+	private String username;
 	private Timestamp joined;
 	
-	@OneToOne
-	private Credentials credentials;
+	@ManyToMany
+	private List<User> following;
 	
 	@OneToMany
 	private List<Tweet> tweets;
 	
+	private boolean deleted;
+	
 	
 	public User() {	
 		this.joined = Timestamp.from(Instant.now());
+		this.deleted = false;
 	}
 	
-	public User(String username, Profile profile, Timestamp joined) { 
+	public User(Profile profile, String username) { 
 		this.profile = profile;
-		this.joined = joined;
+		this.deleted = false;
+		this.username = username;
 	}
 	
 	
 	public Integer getId() { return id; }
-	public String getUsername() { return credentials.getUsername(); }
+	public String getUsername() { return username; }
 	public Profile getProfile() { return profile; }
 	public Timestamp getJoined() { return joined; }
 	public List<Tweet> getTweets() { return tweets; }
-	public Credentials getCredentials() { return credentials; }
+	public boolean isDeleted() { return deleted; }
 	
 	public void setId(Integer id) { this.id = id; }
 	public void setProfile(Profile profile) { this.profile = profile; }
-	public void setCredentials(Credentials credentials) {this.credentials = credentials; }
-
+	public void setUsername(String userName) { this.username = userName; }
+	public void deleteUser() {this.deleted = true; }
+	public void recoverUser() { this.deleted = false; }
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
