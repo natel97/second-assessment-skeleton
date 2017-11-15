@@ -22,18 +22,25 @@ public class Tweet {
 
 	@ManyToOne
 	private User author;
-	private Timestamp posted;
-	private String content;
+	
 	@OneToOne
 	private Tweet inReplyTo;
 	@OneToOne
 	private Tweet repostOf;
+	
+	@ManyToMany
+	private List<User> mentions;
+	
 	@ManyToMany
 	private List<Hashtag> hashtags;
+	
+	private Timestamp posted;
+	private String content;
 	private boolean deleted;
 
 	public Tweet() {
 		this.deleted = false;
+		this.posted = Timestamp.from(Instant.now());
 	}
 
 	public Tweet(User author, String content, Tweet inReplyTo, Tweet repostOf) {
@@ -43,81 +50,41 @@ public class Tweet {
 		this.inReplyTo = inReplyTo;
 		this.repostOf = repostOf;
 		this.deleted = false;
-		search(content);
 	}
 
-	private void search(String content) {
-		Matcher atMatcher = Pattern.compile("@\\w+ ").matcher(content);
-		Matcher hashtagMatcher = Pattern.compile("#\\w+ ").matcher(content);
-		while (atMatcher.find()) {
-			System.out.println(atMatcher.group());
-		}
-		while (hashtagMatcher.find()) {
-			System.out.println(hashtagMatcher.group());
-		}
-	}
 
-	public Integer getId() {
-		return id;
+	public Integer getId() { return id; }
+	public User getAuthor() { return author; }
+	public Timestamp getPosted() { return posted; }
+	public String getContent() { return content; }
+	public List<User> getMentions(){ return mentions; }
+	public List<Hashtag> getHashtags() { return hashtags; }
+	public Tweet getInReplyTo() { return inReplyTo; }
+	public Tweet getRepostOf() { return repostOf; }
+	public boolean isDeleted() { return deleted; }
+	
+	public void setId(Integer id) { this.id = id; }
+	public void setAuthor(User author) { this.author = author; }
+	public void setPosted(Timestamp posted) { this.posted = posted; }
+	public void setContent(String content) { this.content = content; }
+	public void setMentions(List<User> mentions) { this.mentions = mentions; }
+	public void setHashtags(List<Hashtag> hashtags) { this.hashtags = hashtags; }
+	public void setInReplyTo(Tweet inReplyTo) { this.inReplyTo = inReplyTo; }
+	public void setRepostOf(Tweet repostOf) { this.repostOf = repostOf; }
+	public void addMention(User u) { mentions.add(u); }
+	public void delete() { this.deleted = true; }
+	public void unDelete() { this.deleted = false; }
+	
+	public void clearHashtagsAndMentions() {
+		mentions.clear();
+		hashtags.clear();
 	}
-
-	public User getAuthor() {
-		return author;
+	
+	public void addHashtag(Hashtag h) {
+		System.out.println(hashtags);
+		hashtags.add(h);
 	}
-
-	public Timestamp getPosted() {
-		return posted;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public Tweet getInReplyTo() {
-		return inReplyTo;
-	}
-
-	public Tweet getRepostOf() {
-		return repostOf;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void delete() {
-		this.deleted = true;
-	}
-
-	public void unDelete() {
-		this.deleted = false;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public void setAuthor(User author) {
-		this.author = author;
-	}
-
-	public void setPosted(Timestamp posted) {
-		this.posted = posted;
-	}
-
-	public void setContent(String content) {
-		search(content);
-		this.content = content;
-	}
-
-	public void setInReplyTo(Tweet inReplyTo) {
-		this.inReplyTo = inReplyTo;
-	}
-
-	public void setRepostOf(Tweet repostOf) {
-		this.repostOf = repostOf;
-	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

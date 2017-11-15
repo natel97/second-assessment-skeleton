@@ -1,23 +1,22 @@
 package com.cooksys.second_assessment.deconstructors;
 
-import com.cooksys.second_assessment.entity.Credentials;
+import com.cooksys.second_assessment.Dto.CredentialsDto;
 
 public class NewTweetDeconstructor {
 
 	public NewTweetDeconstructor() { }
 
-	public NewTweetDeconstructor(String content, Credentials cred) {
+	public NewTweetDeconstructor(String content, CredentialsDto credentials) {
 		this.content = content;
-		this.cred = cred;
+		this.credentials = credentials;
 	}
 	private String content;
-	private Credentials cred;
+	private CredentialsDto credentials;
 	
 	public String getContent() { return content; }
-	public Credentials getCred() { return cred; }
+	public CredentialsDto getCred() { return credentials; }
 	
 	public void setContent(String content) { this.content = content; }
-	public void setCred(Credentials cred) { this.cred = cred; }
-	
+	public void setCred(CredentialsDto cred) { this.credentials = cred; }
 	
 }

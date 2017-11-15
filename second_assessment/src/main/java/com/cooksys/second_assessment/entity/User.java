@@ -36,6 +36,8 @@ public class User {
 	@OneToMany
 	private List<Tweet> tweets;
 	
+	@ManyToMany 
+	private List<Tweet> mentioned;
 	private boolean deleted;
 	
 	public User() {	

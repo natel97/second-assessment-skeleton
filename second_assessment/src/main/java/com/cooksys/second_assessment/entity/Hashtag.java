@@ -2,12 +2,10 @@ package com.cooksys.second_assessment.entity;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 
 @Entity
 public class Hashtag {
@@ -19,16 +17,20 @@ public class Hashtag {
 	private Timestamp firstUsed;
 	private Timestamp lastUsed;
 	
-	@ManyToMany
-	private List<Tweet> tweets;
-	
 	public Hashtag() { }
 	
 	public Hashtag(String label) {
+		this.label = label;
 		firstUsed =  Timestamp.from(Instant.now());
 		lastUsed = firstUsed;
 	}
 	
+	@Override
+	public String toString() {
+		return "Hashtag [id=" + id + ", label=" + label + ", firstUsed=" + firstUsed + ", lastUsed=" + lastUsed
+				+ "]";
+	}
+
 	public void updateLastUsed() { lastUsed = Timestamp.from(Instant.now()); }
 	
 	public Integer getId() { return id; }
@@ -37,11 +39,10 @@ public class Hashtag {
 	public Timestamp getLastUsed() { return lastUsed; }
 	
 	public void setId(Integer id) { this.id = id; }
+	public void setLabel(String label) { this.label = label; }
+	public void setFirstUsed(Timestamp firstUsed) { this.firstUsed = firstUsed; }
+	public void setLastUsed(Timestamp lastUsed) { this.lastUsed = lastUsed; }
 	
-	public void addTweet(Tweet t) {
-		tweets.add(t);
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

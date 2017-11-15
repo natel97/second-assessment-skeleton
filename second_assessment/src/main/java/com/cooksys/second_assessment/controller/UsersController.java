@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.second_assessment.Dto.CredentialsDto;
-import com.cooksys.second_assessment.Dto.ProfileDto;
 import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.UserDeconstructor;
-import com.cooksys.second_assessment.entity.Credentials;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.EntityAlreadyExistsException;
 import com.cooksys.second_assessment.exceptions.InsufficentInformationException;
+import com.cooksys.second_assessment.exceptions.NotFoundException;
 import com.cooksys.second_assessment.exceptions.PasswordMismatchException;
 import com.cooksys.second_assessment.exceptions.UDException;
+import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.service.CredentialsService;
 import com.cooksys.second_assessment.service.UsersService;
 
@@ -32,9 +32,11 @@ public class UsersController {
 
 	UsersService usersService;
 	CredentialsService credentialsService;
+	DtoMapper mapper;
 
-	public UsersController(UsersService usersService, CredentialsService credService) {
+	public UsersController(UsersService usersService, CredentialsService credService, DtoMapper mapper) {
 		this.usersService = usersService;
+		this.mapper = mapper;
 		this.credentialsService = credService;
 	}
 
@@ -46,11 +48,11 @@ public class UsersController {
 	@PostMapping()
 	public UserDto addUser(@RequestBody UserDeconstructor userDeconstructor, HttpServletResponse httpResponse) {
 		try {
-			if (usersService.findUserByUsername(userDeconstructor.getCred().getUsername()) != null)
+			if (usersService.findUserByUsername(userDeconstructor.getCredentials().getUsername()) != null)
 				throw new EntityAlreadyExistsException();
-			credentialsService.addCredentials(userDeconstructor.getCred());
-			return usersService.addUser(userDeconstructor.getCred(),
-					new User(userDeconstructor.getProfile(), userDeconstructor.getCred().getUsername()));
+			credentialsService.addCredentials(mapper.toCredentials(userDeconstructor.getCredentials()));
+			return usersService.addUser(mapper.toCredentials(userDeconstructor.getCredentials()),
+					new User(mapper.toProfile(userDeconstructor.getProfile()), userDeconstructor.getCredentials().getUsername()));
 		} catch (UDException e) {
 			httpResponse.setStatus(e.errorCode);
 			System.out.println(e.errorMessage);
@@ -59,18 +61,27 @@ public class UsersController {
 	}
 
 	@GetMapping("/@{username}")
-	public UserDto getUser(@PathVariable String username) {
-		return usersService.findUserByUsername(username);
+	public UserDto getUser(@PathVariable String username, HttpServletResponse httpResponse) {
+		UserDto toReturn = null;
+		try {
+		toReturn = usersService.findUserByUsername(username);
+		if (toReturn == null)
+				throw new NotFoundException();
+			} catch (UDException e) {
+				httpResponse.setStatus(e.errorCode);
+				e.printStackTrace();
+			}
+		return toReturn;
 	}
 
 	@PatchMapping("@{username}")
-	public UserDto updateUser(HttpServletResponse httpResponse, @PathVariable String username,
-			@RequestBody CredentialsDto credentials, @RequestBody ProfileDto profile)
+	public UserDto updateUser(HttpServletResponse httpResponse, @PathVariable String username, @RequestBody UserDeconstructor userDeconstructor)
 			throws PasswordMismatchException, InsufficentInformationException {
+		
 		try {
-			if (!username.equals(credentials.getUsername()))
+			if (!username.equals(userDeconstructor.getCredentials().getUsername()))
 				throw new PasswordMismatchException();
-			return usersService.updateUser(username, credentials, profile);
+			return usersService.updateUser(username, userDeconstructor.getCredentials(), userDeconstructor.getProfile());
 		} catch (UDException e) {
 			httpResponse.setStatus(e.errorCode);
 			return null;
@@ -95,12 +106,12 @@ public class UsersController {
 	}
 
 	@PostMapping("@{username}/follow")
-	public void followUser(@PathVariable String userToFollow, @RequestBody CredentialsDto cred, HttpServletResponse resp) {
+	public void followUser(@PathVariable String userToFollow, @RequestBody CredentialsDto cred, HttpServletResponse httpResponse) {
 		try {
 			usersService.validateUser(cred);
 			usersService.makeAFollowB(cred.getUsername(),userToFollow);
 		} catch (UDException e) {
-			resp.setStatus(e.errorCode);
+			httpResponse.setStatus(404);
 			e.printStackTrace();
 		}
 	}
@@ -118,9 +129,8 @@ public class UsersController {
 	}
 
 	@GetMapping("@{username}/feed")
-	public String getUserFeed(@PathVariable String username) {
-		// TODO: Get all authorized tweets, reposts, and replies in chronological order
-		return username + "'s feed!";
+	public void getUserFeed(@PathVariable String username) {
+		
 	}
 
 	@GetMapping("@{username}/mentions")

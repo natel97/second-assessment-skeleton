@@ -1,24 +1,24 @@
 package com.cooksys.second_assessment.deconstructors;
 
-import com.cooksys.second_assessment.entity.Credentials;
-import com.cooksys.second_assessment.entity.Profile;
+import com.cooksys.second_assessment.Dto.CredentialsDto;
+import com.cooksys.second_assessment.Dto.ProfileDto;
 
 public class UserDeconstructor {
 	
-	Credentials cred;
-	Profile profile;
+	CredentialsDto credentials;
+	ProfileDto profile;
 	
 	UserDeconstructor(){}
 	
-	UserDeconstructor(Credentials cred, Profile profile){
-		this.cred = cred;
+	UserDeconstructor(CredentialsDto credentials, ProfileDto profile){
+		this.credentials = credentials;
 		this.profile = profile;
 	}
 
-	public Credentials getCred() {return cred; }
-	public Profile getProfile() { return profile; }
+	public CredentialsDto getCredentials() {return credentials; }
+	public ProfileDto getProfile() { return profile; }
 	
-	public void setCred(Credentials cred) { this.cred = cred; }
-	public void setProfile(Profile profile) { this.profile = profile; }
+	public void setCredentials(CredentialsDto cred) { this.credentials = cred; }
+	public void setProfile(ProfileDto profile) { this.profile = profile; }
 	
 }

@@ -19,11 +19,11 @@ import com.cooksys.second_assessment.entity.User;
 @Mapper(componentModel = "spring")
 public interface DtoMapper {
 	
-	ContextDto toContextPojo(Context contextDao);
-	Context toContextDao(ContextDto context);
+	ContextDto toContextDto(Context contextDao);
+	Context toContext(ContextDto context);
 	
 	CredentialsDto toCredentialsDto(Credentials credentials);
-	Credentials toCredentialsDao(CredentialsDto credentials);
+	Credentials toCredentials(CredentialsDto credentials);
 	
 	HashtagDto toHashtagDto(Hashtag hashtag);
 	Hashtag toHashtag(HashtagDto hashtag);

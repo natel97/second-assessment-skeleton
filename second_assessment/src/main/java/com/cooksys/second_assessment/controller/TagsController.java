@@ -30,8 +30,8 @@ public class TagsController {
 	}
 	
 	@GetMapping("{label}")
-	public List<TweetDto> getTweetsByTag(@PathVariable String tag) {
-		return tweetsService.findTweetsByHashtag(hashtagService.findHashtagByLabel(tag));
+	public List<TweetDto> getTweetsByTag(@PathVariable String label) {
+		return tweetsService.findTweetsByHashtag(hashtagService.findHashtagByLabel(label));
 	}
 	
 }
