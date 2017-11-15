@@ -5,7 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class Credentials {
+public class Credential {
 	
 	@Id
 	@GeneratedValue
@@ -14,8 +14,8 @@ public class Credentials {
 	private String password;
 	
 	
-	public Credentials() { }
-	public Credentials(String userName, String password) {
+	public Credential() { }
+	public Credential(String userName, String password) {
 		this.username = userName;
 		this.password = password;
 	}
@@ -42,7 +42,7 @@ public class Credentials {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Credentials other = (Credentials) obj;
+		Credential other = (Credential) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

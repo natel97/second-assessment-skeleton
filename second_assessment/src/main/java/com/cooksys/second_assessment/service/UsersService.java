@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.cooksys.second_assessment.Dto.CredentialsDto;
 import com.cooksys.second_assessment.Dto.ProfileDto;
 import com.cooksys.second_assessment.Dto.UserDto;
-import com.cooksys.second_assessment.entity.Credentials;
+import com.cooksys.second_assessment.entity.Credential;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.InsufficentInformationException;
 import com.cooksys.second_assessment.exceptions.PasswordMismatchException;
@@ -47,7 +47,10 @@ public class UsersService {
 	}
 	
 	public void validateUser(CredentialsDto cred) throws PasswordMismatchException {
-		if(cred.getPassword().equals(credentialsRepository.findCredentialsByUsername(cred.getUsername()).getPassword()))
+		System.out.println(credentialsRepository.findCredentialByUsername(cred.getUsername()));
+		String a = credentialsRepository.findCredentialByUsername(cred.getUsername()).getPassword();
+		String b = cred.getPassword();
+		if(!a.equals(b))
 			throw new PasswordMismatchException();
 	}
 	
@@ -64,7 +67,7 @@ public class UsersService {
 	}
 	
 	@Transactional
-	public UserDto addUser(Credentials cred, User u) throws InsufficentInformationException {
+	public UserDto addUser(Credential cred, User u) throws InsufficentInformationException {
 		if(cred.getUsername() == null || cred.getPassword() == null || u.getProfile().getEmail() == null) {
 			System.out.println("Username, password, or email not provided");
 			throw new InsufficentInformationException();

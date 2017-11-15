@@ -1,12 +1,12 @@
 package com.cooksys.second_assessment.repository;
 
-import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapProperties.Credential;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.cooksys.second_assessment.entity.Credentials;
+import com.cooksys.second_assessment.entity.Credential;
 
-public interface CredentialsRepository extends JpaRepository<Credentials, Integer> {
+
+public interface CredentialsRepository extends JpaRepository<Credential, Integer> {
 	
-	public Credential findCredentialsByUsername(String username);
+	public Credential findCredentialByUsername(String username);
 
 }

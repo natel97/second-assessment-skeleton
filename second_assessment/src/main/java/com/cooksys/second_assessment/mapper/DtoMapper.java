@@ -10,7 +10,7 @@ import com.cooksys.second_assessment.Dto.ProfileDto;
 import com.cooksys.second_assessment.Dto.TweetDto;
 import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.entity.Context;
-import com.cooksys.second_assessment.entity.Credentials;
+import com.cooksys.second_assessment.entity.Credential;
 import com.cooksys.second_assessment.entity.Hashtag;
 import com.cooksys.second_assessment.entity.Profile;
 import com.cooksys.second_assessment.entity.Tweet;
@@ -22,8 +22,8 @@ public interface DtoMapper {
 	ContextDto toContextDto(Context contextDao);
 	Context toContext(ContextDto context);
 	
-	CredentialsDto toCredentialsDto(Credentials credentials);
-	Credentials toCredentials(CredentialsDto credentials);
+	CredentialsDto toCredentialsDto(Credential credential);
+	Credential toCredentials(CredentialsDto credentials);
 	
 	HashtagDto toHashtagDto(Hashtag hashtag);
 	Hashtag toHashtag(HashtagDto hashtag);

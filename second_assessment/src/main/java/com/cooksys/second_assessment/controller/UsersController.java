@@ -106,10 +106,10 @@ public class UsersController {
 	}
 
 	@PostMapping("@{username}/follow")
-	public void followUser(@PathVariable String userToFollow, @RequestBody CredentialsDto cred, HttpServletResponse httpResponse) {
+	public void followUser(@PathVariable String username, @RequestBody CredentialsDto credentials, HttpServletResponse httpResponse) {
 		try {
-			usersService.validateUser(cred);
-			usersService.makeAFollowB(cred.getUsername(),userToFollow);
+			usersService.validateUser(credentials);
+			usersService.makeAFollowB(credentials.getUsername(),username);
 		} catch (UDException e) {
 			httpResponse.setStatus(404);
 			e.printStackTrace();
@@ -117,10 +117,10 @@ public class UsersController {
 	}
 
 	@PostMapping("@{username}/unfollow")
-	public void unfollowUser(@PathVariable String userToUnfollow, @RequestBody CredentialsDto cred, HttpServletResponse resp) {
+	public void unfollowUser(@PathVariable String username, @RequestBody CredentialsDto credentials, HttpServletResponse resp) {
 		try {
-			usersService.validateUser(cred);
-			usersService.makeAUnfollowB(cred.getUsername(),userToUnfollow);
+			usersService.validateUser(credentials);
+			usersService.makeAUnfollowB(credentials.getUsername(),username);
 		} catch (UDException e) {
 			resp.setStatus(e.errorCode);
 			e.printStackTrace();
