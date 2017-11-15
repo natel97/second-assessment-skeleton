@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.cooksys.second_assessment.Dto.HashtagDto;
 import com.cooksys.second_assessment.Dto.TweetDto;
+import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.NewTweetDeconstructor;
 import com.cooksys.second_assessment.entity.Hashtag;
 import com.cooksys.second_assessment.entity.Tweet;
@@ -125,5 +126,25 @@ public class TweetsService {
 			throw new NotFoundException();
 		}
 	}
-
+	
+	public List<UserDto> getLikes(Integer id) throws NotFoundException{
+		try {
+			return tweetsRepository.getOne(id).getLikes().stream().map(mapper::toUserDto).collect(Collectors.toList());
+		}
+		catch(Exception e) {
+			throw new NotFoundException();
+		}
+	}
+	
+	public List<UserDto> getMentions(Integer id) throws NotFoundException{
+		try {
+			return tweetsRepository.getOne(id).getMentions().stream().map(mapper::toUserDto).collect(Collectors.toList());
+		}
+		catch(Exception e) {
+			throw new NotFoundException();
+		}
+	}
+	public List<TweetDto> findTweetsByPersonMentioned(String username){
+		return tweetsRepository.findByMentions(userRepository.findUsersByUsername(username)).stream().filter(x -> x.isDeleted() == false).map(mapper::toTweetDto).collect(Collectors.toList());
+	}
 }

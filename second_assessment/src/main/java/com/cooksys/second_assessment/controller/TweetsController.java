@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cooksys.second_assessment.Dto.CredentialsDto;
 import com.cooksys.second_assessment.Dto.HashtagDto;
 import com.cooksys.second_assessment.Dto.TweetDto;
+import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.NewTweetDeconstructor;
 import com.cooksys.second_assessment.exceptions.NotFoundException;
 import com.cooksys.second_assessment.exceptions.UDException;
@@ -44,7 +45,7 @@ public class TweetsController {
 			userService.validateUser(newTweetDeconstructor.getCred());
 			return tweetService.addTweet(newTweetDeconstructor);
 		} catch (UDException e) {
-			response.setStatus(e.errorCode);
+			response.setStatus(e.getErrorCode());
 		}
 		return null;
 
@@ -55,7 +56,7 @@ public class TweetsController {
 		try {
 			return tweetService.findById(id);
 		} catch (NotFoundException e) {
-			response.setStatus(e.errorCode);
+			response.setStatus(e.getErrorCode());
 			e.printStackTrace();
 		}
 		return null;
@@ -69,14 +70,19 @@ public class TweetsController {
 			return tweetService.deleteTweet(id);
 
 		} catch (UDException e) {
-			response.setStatus(e.errorCode);
+			response.setStatus(e.getErrorCode());
 		}
 		return null;
 	}
 
 	@PostMapping("{id}/like")
-	public void likeTweet(@PathVariable Integer id) {
-
+	public void likeTweet(@PathVariable Integer id, @RequestBody CredentialsDto credentials, HttpServletResponse response) {
+		try {
+			userService.validateUser(credentials);
+			userService.addLike(id, credentials.getUsername());
+		} catch (UDException e) {
+			response.setStatus(e.getErrorCode());
+		}
 	}
 
 	@PostMapping("{id}/reply")
@@ -97,8 +103,14 @@ public class TweetsController {
 	}
 
 	@GetMapping("{id}/likes")
-	public void getLikes(@PathVariable Integer id) {
-		// Return a list of users who like it!
+	public List<UserDto> getLikes(@PathVariable Integer id, HttpServletResponse response) {
+		try {
+			return tweetService.getLikes(id);
+		}
+		catch(UDException e) {
+			response.setStatus(e.getErrorCode());
+		}
+		return null;
 	}
 
 	@GetMapping("{id}/context")
@@ -117,8 +129,13 @@ public class TweetsController {
 	}
 
 	@GetMapping("{id}/mentions")
-	public void getMentions(@PathVariable Integer id) {
-
+	public List<UserDto> getMentions(@PathVariable Integer id, HttpServletResponse response) {
+		try {
+			return tweetService.getMentions(id);
+		} catch (UDException e) {
+			response.setStatus(e.getErrorCode());
+		}
+		return null;
 	}
 
 }

@@ -53,15 +53,17 @@ public class UsersController {
 	@PostMapping()
 	public UserDto addUser(@RequestBody UserDeconstructor userDeconstructor, HttpServletResponse httpResponse) {
 		try {
-			if (usersService.findUserByUsername(userDeconstructor.getCredentials().getUsername()) != null)
-				throw new EntityAlreadyExistsException();
-			credentialsService.addCredentials(mapper.toCredentials(userDeconstructor.getCredentials()));
-			return usersService.addUser(mapper.toCredentials(userDeconstructor.getCredentials()),
-					new User(mapper.toProfile(userDeconstructor.getProfile()), userDeconstructor.getCredentials().getUsername()));
-		} catch (UDException e) {
-			httpResponse.setStatus(e.errorCode);
-			System.out.println(e.errorMessage);
+			usersService.findUserByUsername(userDeconstructor.getCredentials().getUsername());
 		}
+		catch(NotFoundException e) {
+			try {
+				return usersService.addUser(userDeconstructor.getCredentials(), mapper.toUserDto(new User(mapper.toProfile(userDeconstructor.getProfile()), userDeconstructor.getCredentials().getUsername())));
+			} catch (InsufficentInformationException e1) {
+				httpResponse.setStatus(e1.getErrorCode());
+			}
+
+		}
+		httpResponse.setStatus(new EntityAlreadyExistsException().getErrorCode());
 		return null;
 	}
 
@@ -73,7 +75,7 @@ public class UsersController {
 		if (toReturn == null)
 				throw new NotFoundException();
 			} catch (UDException e) {
-				httpResponse.setStatus(e.errorCode);
+				httpResponse.setStatus(e.getErrorCode());
 				e.printStackTrace();
 			}
 		return toReturn;
@@ -88,7 +90,7 @@ public class UsersController {
 				throw new PasswordMismatchException();
 			return usersService.updateUser(username, userDeconstructor.getCredentials(), userDeconstructor.getProfile());
 		} catch (UDException e) {
-			httpResponse.setStatus(e.errorCode);
+			httpResponse.setStatus(e.getErrorCode());
 			return null;
 		}
 	}
@@ -105,7 +107,7 @@ public class UsersController {
 				return usersService.deleteUser(username);
 			}
 		} catch (UDException e) {
-			httpResponse.setStatus(e.errorCode);
+			httpResponse.setStatus(e.getErrorCode());
 		}
 		return null;
 	}
@@ -116,7 +118,7 @@ public class UsersController {
 			usersService.validateUser(credentials);
 			usersService.makeAFollowB(credentials.getUsername(),username);
 		} catch (UDException e) {
-			httpResponse.setStatus(404);
+			httpResponse.setStatus(e.getErrorCode());
 			e.printStackTrace();
 		}
 	}
@@ -127,7 +129,7 @@ public class UsersController {
 			usersService.validateUser(credentials);
 			usersService.makeAUnfollowB(credentials.getUsername(),username);
 		} catch (UDException e) {
-			resp.setStatus(e.errorCode);
+			resp.setStatus(e.getErrorCode());
 			e.printStackTrace();
 		}	
 		
@@ -143,14 +145,14 @@ public class UsersController {
 		try {
 			return tweetsService.findTweetByAuthor(username).stream().filter(x -> x.isDeleted() == false).map(mapper::toTweetDto).collect(Collectors.toList());
 		} catch (NotFoundException e) {
-			response.setStatus(e.errorCode);
+			response.setStatus(e.getErrorCode());
 		}
 		return null;
 	}
 
 	@GetMapping("@{username}/mentions")
-	public void getMentions(@PathVariable String username) {
-
+	public List<TweetDto> getMentions(@PathVariable String username) {
+		return tweetsService.findTweetsByPersonMentioned(username);
 	}
 
 	@GetMapping("@{username}/followers")

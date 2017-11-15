@@ -15,4 +15,6 @@ public interface TweetsRepository extends JpaRepository<Tweet, Integer> {
 	List<Tweet> findByHashtags(Hashtag Hashtag);
 	
 	List<Tweet> findByDeleted(boolean deleted);
+	
+	List<Tweet> findByMentions(User user);
 }

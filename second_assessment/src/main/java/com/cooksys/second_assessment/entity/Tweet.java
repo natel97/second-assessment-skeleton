@@ -34,11 +34,12 @@ public class Tweet {
 	@OneToOne
 	private Tweet repostOf;
 
+	@ManyToMany
+	private List<User> likes;
 	
 	private Timestamp posted;
 	private String content;
 	private boolean deleted;
-	private List<User> likes;
 
 	public Tweet() {
 		this.deleted = false;
