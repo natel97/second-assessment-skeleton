@@ -13,6 +13,7 @@ import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.entity.Credential;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.InsufficentInformationException;
+import com.cooksys.second_assessment.exceptions.NotFoundException;
 import com.cooksys.second_assessment.exceptions.PasswordMismatchException;
 import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.repository.CredentialsRepository;
@@ -39,19 +40,36 @@ public class UsersService {
 	}
 	
 	public List<UserDto> getAllUsers(){
-		return usersRepository.findAll().stream().map(mapper::toUserDto).collect(Collectors.toList());
+		return usersRepository.findAll().stream().filter(x -> x.isDeleted() == false).map(mapper::toUserDto).collect(Collectors.toList());
 	}
 	
-	public UserDto findUserByUsername(String username) {
-		return mapper.toUserDto(usersRepository.findUsersByUsername(username));
+	public UserDto findUserByUsername(String username) throws NotFoundException {
+		try{
+			User u = usersRepository.findUsersByUsername(username);
+			return u.isDeleted() ? null : mapper.toUserDto(usersRepository.findUsersByUsername(username));
+		}
+		catch(Exception e) {
+			throw new NotFoundException();
+		}
+		
+	}
+	public boolean usernameTaken(String username) {
+		return usersRepository.findUsersByUsername(username) != null;
 	}
 	
-	public void validateUser(CredentialsDto cred) throws PasswordMismatchException {
+	public void validateUser(CredentialsDto cred) throws PasswordMismatchException, NotFoundException {
 		System.out.println(credentialsRepository.findCredentialByUsername(cred.getUsername()));
+		boolean matches;
+		try {
 		String a = credentialsRepository.findCredentialByUsername(cred.getUsername()).getPassword();
 		String b = cred.getPassword();
-		if(!a.equals(b))
-			throw new PasswordMismatchException();
+		matches = a.equals(b);
+		}
+		catch(Exception e) {
+			throw new NotFoundException();
+		}
+		if(!matches)
+		throw new PasswordMismatchException();
 	}
 	
 	public List<UserDto> findExistingUsers(){
@@ -96,7 +114,7 @@ public class UsersService {
 		return mapper.toUserDto(usersRepository.findUsersByUsername(username));
 	}
 
-	public UserDto updateUser(String username, CredentialsDto credentials, ProfileDto profile) throws PasswordMismatchException {
+	public UserDto updateUser(String username, CredentialsDto credentials, ProfileDto profile) throws PasswordMismatchException, NotFoundException {
 		validateUser(credentials);
 		profileRepository.save(mapper.toProfile(profile));
 		return mapper.toUserDto(usersRepository.findUsersByUsername(username));

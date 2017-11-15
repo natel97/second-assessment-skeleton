@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.exceptions.NotFoundException;
 import com.cooksys.second_assessment.service.HashtagService;
 import com.cooksys.second_assessment.service.UsersService;
 
@@ -27,12 +28,16 @@ public class ValidationController {
 	
 	@GetMapping("username/exists/@{username}")
 	public boolean userExists(@PathVariable String username) {
-		return usersService.findUserByUsername(username) != null;
+		try {
+			return usersService.findUserByUsername(username) != null;
+		} catch (NotFoundException e) {
+			return false;
+		}
 	}
 	
 	@GetMapping("username/available/@{username}")
 	public boolean userAvailable(@PathVariable String username) {
-		return !userExists(username);
+		return !usersService.usernameTaken(username);
 	}
 
 }

@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.cooksys.second_assessment.entity.Hashtag;
 import com.cooksys.second_assessment.entity.Tweet;
+import com.cooksys.second_assessment.entity.User;
 
 public interface TweetsRepository extends JpaRepository<Tweet, Integer> {
 	
-	List<Tweet> findByAuthorId(Integer id);
+	List<Tweet> findByAuthor(User user);
 	
 	List<Tweet> findByHashtags(Hashtag Hashtag);
 	

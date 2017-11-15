@@ -1,6 +1,7 @@
 package com.cooksys.second_assessment.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.second_assessment.Dto.CredentialsDto;
+import com.cooksys.second_assessment.Dto.TweetDto;
 import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.UserDeconstructor;
 import com.cooksys.second_assessment.entity.User;
@@ -24,6 +26,7 @@ import com.cooksys.second_assessment.exceptions.PasswordMismatchException;
 import com.cooksys.second_assessment.exceptions.UDException;
 import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.service.CredentialsService;
+import com.cooksys.second_assessment.service.TweetsService;
 import com.cooksys.second_assessment.service.UsersService;
 
 @RestController
@@ -33,11 +36,13 @@ public class UsersController {
 	UsersService usersService;
 	CredentialsService credentialsService;
 	DtoMapper mapper;
+	TweetsService tweetsService;
 
-	public UsersController(UsersService usersService, CredentialsService credService, DtoMapper mapper) {
+	public UsersController(TweetsService tweetService, UsersService usersService, CredentialsService credService, DtoMapper mapper) {
 		this.usersService = usersService;
 		this.mapper = mapper;
 		this.credentialsService = credService;
+		this.tweetsService = tweetService;
 	}
 
 	@GetMapping
@@ -131,6 +136,16 @@ public class UsersController {
 	@GetMapping("@{username}/feed")
 	public void getUserFeed(@PathVariable String username) {
 		
+	}
+	
+	@GetMapping("@{username}/tweets")
+	public List<TweetDto> getUserTweets(String username, HttpServletResponse response){
+		try {
+			return tweetsService.findTweetByAuthor(username).stream().filter(x -> x.isDeleted() == false).map(mapper::toTweetDto).collect(Collectors.toList());
+		} catch (NotFoundException e) {
+			response.setStatus(e.errorCode);
+		}
+		return null;
 	}
 
 	@GetMapping("@{username}/mentions")

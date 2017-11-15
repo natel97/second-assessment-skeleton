@@ -2,9 +2,8 @@ package com.cooksys.second_assessment.entity;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,24 +22,34 @@ public class Tweet {
 	@ManyToOne
 	private User author;
 	
-	@OneToOne
-	private Tweet inReplyTo;
-	@OneToOne
-	private Tweet repostOf;
-	
 	@ManyToMany
 	private List<User> mentions;
 	
 	@ManyToMany
 	private List<Hashtag> hashtags;
 	
+	
+	@OneToOne
+	private Tweet inReplyTo;
+	@OneToOne
+	private Tweet repostOf;
+
+	
 	private Timestamp posted;
 	private String content;
 	private boolean deleted;
+	private List<User> likes;
 
 	public Tweet() {
 		this.deleted = false;
 		this.posted = Timestamp.from(Instant.now());
+	}
+
+	@Override
+	public String toString() {
+		return "Tweet [id=" + id + ", author=" + author + ", inReplyTo=" + inReplyTo + ", repostOf=" + repostOf
+				+ ", mentions=" + mentions + ", hashtags=" + hashtags + ", posted=" + posted + ", content=" + content
+				+ ", deleted=" + deleted + "]";
 	}
 
 	public Tweet(User author, String content, Tweet inReplyTo, Tweet repostOf) {
@@ -50,6 +59,9 @@ public class Tweet {
 		this.inReplyTo = inReplyTo;
 		this.repostOf = repostOf;
 		this.deleted = false;
+		this.hashtags = new ArrayList<Hashtag>();
+		this.mentions = new ArrayList<User>();
+		this.likes = new ArrayList<User>();
 	}
 
 
@@ -57,6 +69,7 @@ public class Tweet {
 	public User getAuthor() { return author; }
 	public Timestamp getPosted() { return posted; }
 	public String getContent() { return content; }
+	public List<User> getLikes() { return likes; }
 	public List<User> getMentions(){ return mentions; }
 	public List<Hashtag> getHashtags() { return hashtags; }
 	public Tweet getInReplyTo() { return inReplyTo; }
@@ -74,6 +87,16 @@ public class Tweet {
 	public void addMention(User u) { mentions.add(u); }
 	public void delete() { this.deleted = true; }
 	public void unDelete() { this.deleted = false; }
+	
+	public void addLike(User u) { 
+		if(!this.likes.contains(u))
+			this.likes.add(u); 
+		}
+	
+	public void removeLike(User u) { 
+		if (this.likes.contains(u))
+			likes.remove(u); 
+		}
 	
 	public void clearHashtagsAndMentions() {
 		mentions.clear();
