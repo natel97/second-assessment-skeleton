@@ -59,13 +59,12 @@ public class UsersController {
 		try {
 			usersService.findUserByUsername(userDeconstructor.getCredentials().getUsername());
 		}
-		catch(NotFoundException e) {
+		catch(UDException e) {
 			try {
 				return usersService.addUser(userDeconstructor.getCredentials(), mapper.toUserDto(new User(mapper.toProfile(userDeconstructor.getProfile()), userDeconstructor.getCredentials().getUsername())));
-			} catch (InsufficentInformationException e1) {
+			} catch (UDException e1) {
 				httpResponse.setStatus(e1.getErrorCode());
 			}
-
 		}
 		httpResponse.setStatus(new EntityAlreadyExistsException().getErrorCode());
 		return null;
@@ -144,15 +143,20 @@ public class UsersController {
 	}
 
 	@GetMapping("@{username}/feed")
-	public void getUserFeed(@PathVariable String username) {
-		//Not yet implemented
+	public List<TweetDto> getUserFeed(@PathVariable String username, HttpServletResponse response) {
+		try {
+			return usersService.getUserFeed(username);
+		} catch (UDException e) {
+			response.setStatus(e.getErrorCode());
+		}
+		return null;
 	}
 	
 	@GetMapping("@{username}/tweets")
 	public List<TweetDto> getUserTweets(String username, HttpServletResponse response){
 		try {
 			return tweetsService.findTweetByAuthor(username).stream().filter(x -> x.isDeleted() == false).map(mapper::toTweetDto).collect(Collectors.toList());
-		} catch (NotFoundException e) {
+		} catch (UDException e) {
 			response.setStatus(e.getErrorCode());
 		}
 		return null;
@@ -173,7 +177,7 @@ public class UsersController {
 	public List<UserDto> getFollowers(@PathVariable String username, HttpServletResponse response) {
 		try {
 			return usersService.getFollowers(username);
-		} catch (NotFoundException e) {
+		} catch (UDException e) {
 			response.setStatus(e.getErrorCode());
 		}
 		return null;

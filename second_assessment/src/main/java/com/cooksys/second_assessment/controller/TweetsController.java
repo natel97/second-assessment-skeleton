@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.postgresql.sspi.NTDSAPIWrapper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +18,7 @@ import com.cooksys.second_assessment.Dto.HashtagDto;
 import com.cooksys.second_assessment.Dto.TweetDto;
 import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.NewTweetDeconstructor;
-import com.cooksys.second_assessment.exceptions.NotFoundException;
 import com.cooksys.second_assessment.exceptions.UDException;
-import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.service.TweetsService;
 import com.cooksys.second_assessment.service.UsersService;
 
@@ -58,7 +55,7 @@ public class TweetsController {
 	public TweetDto getTweetByID(@PathVariable Integer id, HttpServletResponse response) {
 		try {
 			return tweetService.findById(id, false);
-		} catch (NotFoundException e) {
+		} catch (UDException e) {
 			response.setStatus(e.getErrorCode());
 			e.printStackTrace();
 		}
@@ -94,7 +91,7 @@ public class TweetsController {
 			HttpServletResponse response) {
 		try {
 			return tweetService.addReply(id, newTweetDeconstructor.getContent(), newTweetDeconstructor.getCred());
-		} catch (NotFoundException e) {
+		} catch (UDException e) {
 			response.setStatus(404);
 		}
 		return null;

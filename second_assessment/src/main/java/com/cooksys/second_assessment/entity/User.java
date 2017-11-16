@@ -52,7 +52,10 @@ public class User {
 		this.username = username;
 	}
 	
-	public void followUser(User u) { following.add(u); }
+	public User followUser(User u) { 
+		following.add(u); 
+		return this;
+		}
 	public void unfollowUser(User u) { following.remove(u); }
 	
 	public Integer getId() { return id; }

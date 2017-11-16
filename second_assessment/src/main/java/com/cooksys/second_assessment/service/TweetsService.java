@@ -20,6 +20,7 @@ import com.cooksys.second_assessment.entity.Hashtag;
 import com.cooksys.second_assessment.entity.Tweet;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.NotFoundException;
+import com.cooksys.second_assessment.exceptions.UDException;
 import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.repository.ContextRepository;
 import com.cooksys.second_assessment.repository.HashtagRepository;
@@ -44,7 +45,7 @@ public class TweetsService {
 	}
 	
 	//Gets any tweet by its id. Can choose to include deleted tweets or not
-	public TweetDto findById(Integer id, boolean includeDeletedTweets) throws NotFoundException {
+	public TweetDto findById(Integer id, boolean includeDeletedTweets) throws UDException {
 		try {
 			Tweet tweet = tweetsRepository.getOne(id);
 			System.out.println(tweet);
@@ -114,7 +115,7 @@ public class TweetsService {
 		return mapper.toTweetDto(tweet);
 	}
 
-	public List<Tweet> findTweetByAuthor(String username) throws NotFoundException {
+	public List<Tweet> findTweetByAuthor(String username) throws UDException {
 		try {
 			if(userRepository.findUsersByUsername(username) == null)
 				throw new Exception();
@@ -124,7 +125,7 @@ public class TweetsService {
 		}
 	}
 
-	public List<HashtagDto> getHashtagsFromTweet(Integer id) throws NotFoundException {
+	public List<HashtagDto> getHashtagsFromTweet(Integer id) throws UDException {
 		try {
 			Tweet tweet = tweetsRepository.findOne(id);
 			if (tweet.isDeleted())
@@ -135,7 +136,7 @@ public class TweetsService {
 		}
 	}
 
-	public List<UserDto> getLikes(Integer id) throws NotFoundException {
+	public List<UserDto> getLikes(Integer id) throws UDException {
 		try {
 			return tweetsRepository.getOne(id).getLikes().stream().map(mapper::toUserDto).collect(Collectors.toList());
 		} catch (Exception e) {
@@ -143,7 +144,7 @@ public class TweetsService {
 		}
 	}
 
-	public List<UserDto> getMentions(Integer id) throws NotFoundException {
+	public List<UserDto> getMentions(Integer id) throws UDException {
 		try {
 			if(tweetsRepository.getOne(id) == null)
 				throw new Exception();
@@ -154,7 +155,7 @@ public class TweetsService {
 		}
 	}
 
-	public List<TweetDto> findTweetsByPersonMentioned(String username) throws NotFoundException {
+	public List<TweetDto> findTweetsByPersonMentioned(String username) throws UDException {
 		if(userRepository.findUsersByUsername(username) == null)
 			throw new NotFoundException();
 		return tweetsRepository.findByMentions(userRepository.findUsersByUsername(username)).stream()
@@ -185,7 +186,7 @@ public class TweetsService {
 	}
 
 	@Transactional
-	public TweetDto addReply(Integer id, String content, CredentialsDto credentials) throws NotFoundException {
+	public TweetDto addReply(Integer id, String content, CredentialsDto credentials) throws UDException {
 		Tweet origin = tweetsRepository.findOne(id);
 		if (userRepository.findUsersByUsername(credentials.getUsername()) == null)
 			throw new NotFoundException();
