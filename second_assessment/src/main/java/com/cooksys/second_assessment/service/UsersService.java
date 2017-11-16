@@ -11,6 +11,7 @@ import com.cooksys.second_assessment.Dto.CredentialsDto;
 import com.cooksys.second_assessment.Dto.ProfileDto;
 import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.entity.Credential;
+import com.cooksys.second_assessment.entity.Profile;
 import com.cooksys.second_assessment.entity.Tweet;
 import com.cooksys.second_assessment.entity.User;
 import com.cooksys.second_assessment.exceptions.InsufficentInformationException;
@@ -63,7 +64,11 @@ public class UsersService {
 		return usersRepository.findUsersByUsername(username) != null;
 	}
 
-	public void validateUser(CredentialsDto cred) throws PasswordMismatchException, NotFoundException {
+	public void validateUser(CredentialsDto cred) throws PasswordMismatchException, NotFoundException, InsufficentInformationException {
+		if(cred == null)
+			throw new InsufficentInformationException();
+		if(cred.getPassword() == null || cred.getPassword() == null)
+			throw new InsufficentInformationException();
 		System.out.println(credentialsRepository.findCredentialByUsername(cred.getUsername().toLowerCase()));
 		boolean matches;
 		try {
@@ -81,12 +86,16 @@ public class UsersService {
 		return usersRepository.findUsersByDeleted(false).stream().map(mapper::toUserDto).collect(Collectors.toList());
 	}
 
-	public List<UserDto> getFollowers(String username) {
+	public List<UserDto> getFollowers(String username) throws NotFoundException {
+		if(usersRepository.findUsersByUsername(username) == null)
+			throw new NotFoundException();
 		return usersRepository.findUsersByFollowing(usersRepository.findUsersByUsername(username)).stream()
 				.map(mapper::toUserDto).collect(Collectors.toList());
 	}
 
-	public List<UserDto> getFollowing(String username) {
+	public List<UserDto> getFollowing(String username) throws NotFoundException {
+		if(usersRepository.findUsersByUsername(username) == null)
+			throw new NotFoundException();
 		return usersRepository.findUsersByUsername(username).getFollowing().stream().map(mapper::toUserDto)
 				.collect(Collectors.toList());
 	}
@@ -109,11 +118,15 @@ public class UsersService {
 	}
 
 	@Transactional
-	public void makeAFollowB(String A, String B) {
+	public void makeAFollowB(String A, String B) throws NotFoundException {
+		if(usersRepository.findUsersByUsername(A) == null || usersRepository.findUsersByUsername(B) == null)
+			throw new NotFoundException();
 		usersRepository.findUsersByUsername(A).followUser(usersRepository.findUsersByUsername(B));
 	}
 
-	public void makeAUnfollowB(String A, String B) {
+	public void makeAUnfollowB(String A, String B) throws NotFoundException {
+		if(usersRepository.findUsersByUsername(A) == null || usersRepository.findUsersByUsername(B) == null)
+			throw new NotFoundException();
 		usersRepository.findUsersByUsername(A).unfollowUser(usersRepository.findUsersByUsername(B));
 	}
 
@@ -126,10 +139,20 @@ public class UsersService {
 	}
 
 	public UserDto updateUser(String username, CredentialsDto credentials, ProfileDto profile)
-			throws PasswordMismatchException, NotFoundException {
+			throws PasswordMismatchException, NotFoundException, InsufficentInformationException {
 		validateUser(credentials);
-		profileRepository.save(mapper.toProfile(profile));
-		return mapper.toUserDto(usersRepository.findUsersByUsername(username));
+		User userToUpdate = usersRepository.findUsersByUsername(username);
+		Profile currentProfile = userToUpdate.getProfile();
+		if(profile.getEmail() != null)
+			currentProfile.setEmail(profile.getEmail());
+		if(profile.getFirstName() != null)
+			currentProfile.setFirstName(profile.getFirstName());
+		if(profile.getPhone() != null) 
+			currentProfile.setPhone(profile.getPhone());
+		if(profile.getLastName() != null)
+			currentProfile.setLastName(profile.getLastName());
+		profileRepository.save(currentProfile);
+		return mapper.toUserDto(userToUpdate);
 	}
 	@Transactional
 	public void addLike(Integer id, String username) throws NotFoundException {

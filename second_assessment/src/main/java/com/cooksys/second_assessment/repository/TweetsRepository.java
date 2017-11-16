@@ -11,10 +11,9 @@ import com.cooksys.second_assessment.entity.User;
 public interface TweetsRepository extends JpaRepository<Tweet, Integer> {
 	
 	List<Tweet> findByAuthor(User user);
-	
 	List<Tweet> findByHashtags(Hashtag Hashtag);
-	
 	List<Tweet> findByDeleted(boolean deleted);
-	
 	List<Tweet> findByMentions(User user);
+	List<Tweet> findByRepostOf(Tweet tweet);
+	List<Tweet> findByInReplyTo(Tweet tweet);
 }

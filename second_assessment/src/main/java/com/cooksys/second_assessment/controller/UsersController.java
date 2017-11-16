@@ -52,6 +52,10 @@ public class UsersController {
 
 	@PostMapping()
 	public UserDto addUser(@RequestBody UserDeconstructor userDeconstructor, HttpServletResponse httpResponse) {
+		if(userDeconstructor.getProfile() == null || userDeconstructor.getCredentials() == null) {
+			httpResponse.setStatus(403);
+			return null;
+		}
 		try {
 			usersService.findUserByUsername(userDeconstructor.getCredentials().getUsername());
 		}
@@ -84,7 +88,10 @@ public class UsersController {
 	@PatchMapping("@{username}")
 	public UserDto updateUser(HttpServletResponse httpResponse, @PathVariable String username, @RequestBody UserDeconstructor userDeconstructor)
 			throws PasswordMismatchException, InsufficentInformationException {
-		
+		if(userDeconstructor.getProfile() == null || userDeconstructor.getCredentials() == null) {
+			httpResponse.setStatus(403);
+			return null;
+		}
 		try {
 			if (!username.equals(userDeconstructor.getCredentials().getUsername()))
 				throw new PasswordMismatchException();
@@ -99,7 +106,6 @@ public class UsersController {
 	public UserDto deleteUser(HttpServletResponse httpResponse, @PathVariable String username,
 			@RequestBody CredentialsDto cred) throws PasswordMismatchException, InsufficentInformationException {
 		try {
-			System.out.println(cred);
 			if (!username.equals(cred.getUsername()))
 				throw new PasswordMismatchException();
 			else {
@@ -115,6 +121,8 @@ public class UsersController {
 	@PostMapping("@{username}/follow")
 	public void followUser(@PathVariable String username, @RequestBody CredentialsDto credentials, HttpServletResponse httpResponse) {
 		try {
+			if(credentials.getUsername() == null || credentials.getPassword() == null)
+				throw new NotFoundException();
 			usersService.validateUser(credentials);
 			usersService.makeAFollowB(credentials.getUsername(),username);
 		} catch (UDException e) {
@@ -137,7 +145,7 @@ public class UsersController {
 
 	@GetMapping("@{username}/feed")
 	public void getUserFeed(@PathVariable String username) {
-		
+		//Not yet implemented
 	}
 	
 	@GetMapping("@{username}/tweets")
@@ -151,18 +159,34 @@ public class UsersController {
 	}
 
 	@GetMapping("@{username}/mentions")
-	public List<TweetDto> getMentions(@PathVariable String username) {
+	public List<TweetDto> getMentions(@PathVariable String username, HttpServletResponse response) {
+		try {
 		return tweetsService.findTweetsByPersonMentioned(username);
+		}
+		catch(UDException e) {
+			response.setStatus(e.getErrorCode());
+		}
+		return null;
 	}
 
 	@GetMapping("@{username}/followers")
-	public List<UserDto> getFollowers(@PathVariable String username) {
-		return usersService.getFollowers(username);
+	public List<UserDto> getFollowers(@PathVariable String username, HttpServletResponse response) {
+		try {
+			return usersService.getFollowers(username);
+		} catch (NotFoundException e) {
+			response.setStatus(e.getErrorCode());
+		}
+		return null;
 	}
 
 	@GetMapping("@{username}/following")
-	public List<UserDto> getFollowing(@PathVariable String username) {
+	public List<UserDto> getFollowing(@PathVariable String username, HttpServletResponse response) {
+		try {
 		return usersService.getFollowing(username);
+		}
+		catch(Exception e) {
+			response.setStatus(404);
+		}
+		return null;
 	}
-
 }

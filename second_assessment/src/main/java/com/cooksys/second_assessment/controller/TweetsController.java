@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.postgresql.sspi.NTDSAPIWrapper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooksys.second_assessment.Dto.ContextDto;
 import com.cooksys.second_assessment.Dto.CredentialsDto;
 import com.cooksys.second_assessment.Dto.HashtagDto;
 import com.cooksys.second_assessment.Dto.TweetDto;
@@ -19,6 +21,7 @@ import com.cooksys.second_assessment.Dto.UserDto;
 import com.cooksys.second_assessment.deconstructors.NewTweetDeconstructor;
 import com.cooksys.second_assessment.exceptions.NotFoundException;
 import com.cooksys.second_assessment.exceptions.UDException;
+import com.cooksys.second_assessment.mapper.DtoMapper;
 import com.cooksys.second_assessment.service.TweetsService;
 import com.cooksys.second_assessment.service.UsersService;
 
@@ -36,7 +39,7 @@ public class TweetsController {
 
 	@GetMapping()
 	public List<TweetDto> getAllTweets() {
-		return tweetService.findAvailableTweets();
+		return tweetService.findAllTweets(false);
 	}
 
 	@PostMapping()
@@ -54,7 +57,7 @@ public class TweetsController {
 	@GetMapping("{id}")
 	public TweetDto getTweetByID(@PathVariable Integer id, HttpServletResponse response) {
 		try {
-			return tweetService.findById(id);
+			return tweetService.findById(id, false);
 		} catch (NotFoundException e) {
 			response.setStatus(e.getErrorCode());
 			e.printStackTrace();
@@ -76,7 +79,8 @@ public class TweetsController {
 	}
 
 	@PostMapping("{id}/like")
-	public void likeTweet(@PathVariable Integer id, @RequestBody CredentialsDto credentials, HttpServletResponse response) {
+	public void likeTweet(@PathVariable Integer id, @RequestBody CredentialsDto credentials,
+			HttpServletResponse response) {
 		try {
 			userService.validateUser(credentials);
 			userService.addLike(id, credentials.getUsername());
@@ -86,19 +90,30 @@ public class TweetsController {
 	}
 
 	@PostMapping("{id}/reply")
-	public void reply(@PathVariable Integer id) {
-		// Needs to parse for @Mentions and #ashtags
-
+	public TweetDto reply(@PathVariable Integer id, @RequestBody NewTweetDeconstructor newTweetDeconstructor,
+			HttpServletResponse response) {
+		try {
+			return tweetService.addReply(id, newTweetDeconstructor.getContent(), newTweetDeconstructor.getCred());
+		} catch (NotFoundException e) {
+			response.setStatus(404);
+		}
+		return null;
 	}
 
 	@PostMapping("{id}/repost")
-	public void repost(@PathVariable Integer id) {
-		// Takes credentials; returns new tweet
+	public TweetDto repost(@PathVariable Integer id, @RequestBody CredentialsDto credentials,
+			HttpServletResponse response) {
+		return tweetService.repostTweet(id, credentials.getUsername());
 	}
 
 	@GetMapping("{id}/tags")
-	public List<HashtagDto> getHashTags(@PathVariable Integer id) throws NotFoundException {
-		return tweetService.getHashtagsFromTweet(id);
+	public List<HashtagDto> getHashTags(@PathVariable Integer id, HttpServletResponse response) {
+		try {
+			return tweetService.getHashtagsFromTweet(id);
+		} catch (UDException e) {
+			response.setStatus(e.getErrorCode());
+		}
+		return null;
 
 	}
 
@@ -106,26 +121,30 @@ public class TweetsController {
 	public List<UserDto> getLikes(@PathVariable Integer id, HttpServletResponse response) {
 		try {
 			return tweetService.getLikes(id);
-		}
-		catch(UDException e) {
+		} catch (UDException e) {
 			response.setStatus(e.getErrorCode());
 		}
 		return null;
 	}
 
 	@GetMapping("{id}/context")
-	public void getContext(@PathVariable Integer id) {
-
+	public ContextDto getContext(@PathVariable Integer id, HttpServletResponse response) {
+		try {
+			return tweetService.getContextFromTweet(id);
+		} catch (Exception e) {
+			response.setStatus(404);
+		}
+		return null;
 	}
 
 	@GetMapping("{id}/replies")
-	public void getReplies(@PathVariable Integer id) {
-
+	public List<TweetDto> getReplies(@PathVariable Integer id) {
+		return tweetService.getReplies(id);
 	}
 
 	@GetMapping("{id}/reposts")
-	public void getReposts(@PathVariable Integer id) {
-
+	public List<TweetDto> getReposts(@PathVariable Integer id) {
+		return tweetService.getTweetReposts(id);
 	}
 
 	@GetMapping("{id}/mentions")

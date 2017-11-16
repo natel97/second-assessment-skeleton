@@ -31,8 +31,12 @@ public class Tweet {
 	
 	@OneToOne
 	private Tweet inReplyTo;
+	
 	@OneToOne
 	private Tweet repostOf;
+	
+	@OneToOne
+	private Context context;
 
 	@ManyToMany
 	private List<User> likes;
@@ -40,6 +44,7 @@ public class Tweet {
 	private Timestamp posted;
 	private String content;
 	private boolean deleted;
+	
 
 	public Tweet() {
 		this.deleted = false;
@@ -76,6 +81,8 @@ public class Tweet {
 	public Tweet getInReplyTo() { return inReplyTo; }
 	public Tweet getRepostOf() { return repostOf; }
 	public boolean isDeleted() { return deleted; }
+	public Context getContext() { return context; }
+	public void setContext(Context c) { this.context = c; }
 	
 	public void setId(Integer id) { this.id = id; }
 	public void setAuthor(User author) { this.author = author; }
@@ -88,6 +95,8 @@ public class Tweet {
 	public void addMention(User u) { mentions.add(u); }
 	public void delete() { this.deleted = true; }
 	public void unDelete() { this.deleted = false; }
+	public void addTweetToAfter__Context(Tweet tweet) { this.context.addAfter(tweet); }
+	public void setBefore__Context(Context context) { context.getBefore().stream().sorted((x, y) -> x.getPosted().compareTo(y.getPosted())).forEach(x -> this.context.addBefore(x)); }
 	
 	public void addLike(User u) { 
 		if(!this.likes.contains(u))

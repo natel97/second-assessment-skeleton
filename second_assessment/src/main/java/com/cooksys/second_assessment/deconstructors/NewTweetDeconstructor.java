@@ -17,6 +17,6 @@ public class NewTweetDeconstructor {
 	public CredentialsDto getCred() { return credentials; }
 	
 	public void setContent(String content) { this.content = content; }
-	public void setCred(CredentialsDto cred) { this.credentials = cred; }
+	public void setCred(CredentialsDto credentials) { this.credentials = credentials; }
 	
 }
