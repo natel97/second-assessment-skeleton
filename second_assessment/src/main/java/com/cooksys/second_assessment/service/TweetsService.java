@@ -188,6 +188,7 @@ public class TweetsService {
 	@Transactional
 	public TweetDto addReply(Integer id, String content, CredentialsDto credentials) throws UDException {
 		Tweet origin = tweetsRepository.findOne(id);
+		
 		if (userRepository.findUsersByUsername(credentials.getUsername()) == null)
 			throw new NotFoundException();
 		Tweet replyTweet = new Tweet(userRepository.findUsersByUsername(credentials.getUsername()), content, origin,

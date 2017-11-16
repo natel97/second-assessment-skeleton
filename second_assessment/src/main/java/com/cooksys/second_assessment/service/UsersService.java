@@ -73,7 +73,6 @@ public class UsersService {
 			throw new InsufficentInformationException();
 		if (cred.getPassword() == null || cred.getPassword() == null)
 			throw new InsufficentInformationException();
-		System.out.println(credentialsRepository.findCredentialByUsername(cred.getUsername().toLowerCase()));
 		boolean matches;
 		try {
 			String a = credentialsRepository.findCredentialByUsername(cred.getUsername()).getPassword();
